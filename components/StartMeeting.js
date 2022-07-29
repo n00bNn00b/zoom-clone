@@ -20,8 +20,8 @@ function StartMeeting({ name, roomId, setName, setRoomId, joinRoom }) {
           placeholder="Enter Room ID"
           placeholderTextColor="#767476"
           value={roomId}
-          onChangeText={(text) => {
-            setRoomId(text);
+          onChangeText={(id) => {
+            setRoomId(id);
           }}
         />
       </View>

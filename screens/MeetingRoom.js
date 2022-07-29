@@ -5,7 +5,7 @@ import StartMeeting from "../components/StartMeeting";
 let socket;
 function MeetingRoom() {
   const [name, setName] = useState("");
-  const [roomId, setRoomId] = useState();
+  const [roomId, setRoomId] = useState("");
 
   const joinRoom = () => {
     socket.emit("join-room", { roomId: roomId, userName: name });
