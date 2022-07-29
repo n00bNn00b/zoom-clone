@@ -4,7 +4,7 @@ import Fontisto from "react-native-vector-icons/Fontisto";
 export default function SearchBar() {
   return (
     <View style={styles.container}>
-      <Fontisto name="search" size={20} color="#858585" />
+      <Fontisto name="search" size={20} color={"#858585"} />
       <Text style={styles.textSearchBar}>Search</Text>
     </View>
   );
