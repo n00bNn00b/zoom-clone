@@ -1,17 +1,17 @@
 import React from "react";
 import { View, SafeAreaView, StyleSheet } from "react-native";
-import ContextMenu from "../components/ContextMenu";
+import ContactMenu from "../components/ContactMenu";
 import Header from "../components/Header";
 import MenuButtons from "../components/MenuButtons";
 import SearchBar from "../components/SearchBar";
-function Home() {
+function Home({ navigation }) {
   return (
     <View style={styles.container}>
       <SafeAreaView style={{ height: "100%" }}>
         <Header />
         <SearchBar />
-        <MenuButtons />
-        <ContextMenu />
+        <MenuButtons navigation={navigation} />
+        <ContactMenu />
       </SafeAreaView>
     </View>
   );

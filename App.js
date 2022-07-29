@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
-import Home from "./screens/Home";
+import Navigation from "./Navigation";
 
 export default function App() {
-  return <Home />;
+  return <Navigation />;
 }
 
 const styles = StyleSheet.create({
