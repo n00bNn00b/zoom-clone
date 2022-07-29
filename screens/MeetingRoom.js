@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
-
+import { io } from "socket.io-client";
 import StartMeeting from "../components/StartMeeting";
-
+let socket;
 function MeetingRoom() {
   const [name, setName] = useState("");
   const [roomId, setRoomId] = useState();
+
+  const joinRoom = () => {
+    socket.emit("join-room", { roomId: roomId, userName: name });
+  };
   useEffect(() => {
+    const url = "https://b2d7-118-179-95-193.in.ngrok.io";
+    socket = io(`${url}`);
+    socket.on("connection", () => console.log("connected"));
     console.log("working");
   }, []);
   return (
@@ -16,6 +23,7 @@ function MeetingRoom() {
         setName={setName}
         roomId={roomId}
         setRoomId={setRoomId}
+        joinRoom={joinRoom}
       />
     </View>
   );
