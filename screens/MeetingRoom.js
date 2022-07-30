@@ -1,6 +1,7 @@
 import { Camera } from "expo-camera";
 import React, { useEffect, useState } from "react";
 import {
+  Modal,
   View,
   Text,
   StyleSheet,
@@ -9,14 +10,15 @@ import {
 } from "react-native";
 import { io } from "socket.io-client";
 import StartMeeting from "../components/StartMeeting";
-let socket;
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Chat from "../components/Chat";
 
 function MeetingRoom() {
   const [name, setName] = useState("");
   const [roomId, setRoomId] = useState("");
   const [activeUsers, setActiveUsers] = useState(["abc", "def"]);
   const [startCamera, setStartCamera] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const startsCamera = async () => {
     const { status } = await Camera.requestCameraPermissionsAsync();
@@ -49,21 +51,19 @@ function MeetingRoom() {
       title: "Participants",
     },
   ];
-
   let socket;
-
   const joinRoom = () => {
     startsCamera();
     socket.emit("join-room", { roomId: roomId, userName: name });
   };
   useEffect(() => {
-    const url = "https://b2d7-118-179-95-193.in.ngrok.io";
-    socket = io(`${url}`);
+    socket = io("https://e38c-118-179-95-193.in.ngrok.io");
     socket.on("connection", () => console.log("connected"));
     socket.on("all-users", (users) => {
       console.log("Active Users");
+      users = users.filter((user) => user.userName !== name);
+      console.log(users, "after cleanup");
       setActiveUsers(users);
-      console.log(users);
     });
   }, []);
   return (
@@ -71,25 +71,54 @@ function MeetingRoom() {
       {/* Camera */}
       {startCamera ? (
         <SafeAreaView style={{ flex: 1 }}>
-          <View style={styles.cameraContainer}>
-            <Camera
-              type={"front"}
-              style={{ width: "100%", height: 600 }}
-            ></Camera>
-            {activeUsers.map((user, index) => (
-              <View key={index} style={styles.activeUserContainer}>
-                <Text style={{ color: "#efefef" }}>{user}</Text>
-              </View>
-            ))}
+          <Modal
+            animationType="slide"
+            transparent={false}
+            presentationStyle={"fullScreen"}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <Chat
+              modalVisible={modalVisible}
+              setModalVisible={setModalVisible}
+            />
+          </Modal>
+          {/* active users */}
+          <View style={styles.activeUsersContainer}>
+            <View style={styles.cameraContainer}>
+              <Camera
+                type={"front"}
+                style={{
+                  width: activeUsers.length <= 1 ? "100%" : 200,
+                  height: activeUsers.length <= 1 ? 600 : 200,
+                }}
+              ></Camera>
+              {activeUsers
+                .filter((user) => user.userName !== name)
+                .map((user, index) => (
+                  <View key={index} style={styles.activeUserContainer}>
+                    <Text style={{ color: "#efefef" }}>{user.userName}</Text>
+                  </View>
+                ))}
+            </View>
           </View>
 
           <View style={styles.menu}>
             {menuIcons.map((icon, index) => (
               <TouchableOpacity key={index} style={styles.tile}>
                 <FontAwesome name={icon.name} size={24} color={"#efefef"} />
-                <Text style={styles.textTile}>{icon.title}</Text>
+                <Text style={styles.textTile}>Chat</Text>
               </TouchableOpacity>
             ))}
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              style={styles.tile}
+            >
+              <FontAwesome name="comment" size={24} color={"#efefef"} />
+              <Text style={styles.textTile}>Chat</Text>
+            </TouchableOpacity>
           </View>
         </SafeAreaView>
       ) : (
@@ -130,5 +159,23 @@ const styles = StyleSheet.create({
   cameraContainer: {
     flex: 1,
     justifyContent: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+  },
+  activeUsersContainer: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
+  },
+  activeUserContainer: {
+    borderColor: "gray",
+    borderWidth: 1,
+    width: 200,
+    height: 200,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
